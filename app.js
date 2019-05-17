@@ -77,7 +77,7 @@ app.use((req, res, next) => {
 
 // routes
 app.use('/', require('./routes/home'))
-app.use('/rewrites', require('./routes/rewrites'))
+app.use('/urls', require('./routes/urls'))
 app.use('/users', require('./routes/users'))
 app.use('/auth', require('./routes/auths'))
 
