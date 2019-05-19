@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
 const Url = require('../url')
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/urls', {
@@ -15,7 +16,8 @@ db.once('open', () => {
   console.log('db connected!')
 
   Url.create({
-    name: 'https://www.facebook.com/'
+    name: 'https://www.facebook.com/',
+    key: bcrypt.hashSync(`https://www.facebook.com/`, 10).slice(-5)
   })
 
   console.log('done')

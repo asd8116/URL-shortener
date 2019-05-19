@@ -2,6 +2,7 @@ const express = require('express')
 const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
+const bcrypt = require('bcryptjs')
 const app = express()
 const mongoose = require('mongoose')
 const Url = require('./models/url')
@@ -42,11 +43,27 @@ app.get('/', (req, res) => {
 
 // 轉化 Url
 app.post('/', (req, res) => {
-  res.send('寫入 urls')
+  const newUrl = new Url({
+    name: req.body.name,
+    key: bcrypt.hashSync(`${req.body.name}`, 10).slice(-5)
+  })
+
+  newUrl
+    .save()
+    .then(user => {
+      console.log(newUrl.key)
+      res.redirect(`/urls/${newUrl.key}`)
+    })
+    .catch(err => console.log(err))
 })
 
-app.get('/urls', (req, res) => {
-  res.render('new')
+app.get('/urls/:key', (req, res) => {
+  Url.findOne({ key: req.params.key }, (err, url) => {
+    if (err) return console.error(err)
+    newUrl = 'localhost:3000/urls/' + url.key
+
+    return res.render('new', { url, newUrl })
+  })
 })
 
 app.listen(process.env.PORT || 3000, () => {
