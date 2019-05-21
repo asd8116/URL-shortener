@@ -1,7 +1,6 @@
 const express = require('express')
 const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
-const methodOverride = require('method-override')
 const bcrypt = require('bcryptjs')
 const app = express()
 const mongoose = require('mongoose')
@@ -34,8 +33,6 @@ app.use(express.static('public'))
 
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.use(methodOverride('_method'))
-
 // routes
 app.get('/', (req, res) => {
   res.render('index')
@@ -43,9 +40,28 @@ app.get('/', (req, res) => {
 
 // 轉化 Url
 app.post('/', (req, res) => {
+  const existUrl = []
+
+  const generatorUrl = () => {
+    let url = ''
+    url += bcrypt.hashSync(`${req.body.name}`, 10).slice(-5)
+
+    return check(url)
+  }
+
+  // 防止重複 5碼網址和出現符號('/', '.')
+  const check = url => {
+    if (existUrl.includes(url, '/', '.')) {
+      return generatorUrl()
+    } else {
+      existUrl.push(url)
+      return url
+    }
+  }
+
   const newUrl = new Url({
     name: req.body.name,
-    key: bcrypt.hashSync(`${req.body.name}`, 10).slice(-5)
+    key: generatorUrl()
   })
 
   newUrl
